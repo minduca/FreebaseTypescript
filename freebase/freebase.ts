@@ -198,7 +198,6 @@ module Minduca.Freebase {
 		output?: any;
 	}
 
-	//For more information, visit https://developers.google.com/commerce-search/docs/static/API_Keys.pdf
 	export interface IFreebaseSearchResultError {
 		error:
 		{
