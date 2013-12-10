@@ -5,7 +5,7 @@
 </head>
 <body>
     <header>
-        <h1>Typescript implementation for Freebase</h1>
+        <h1>A Typescript/Javascript library for Google Knowledge Graph (Freebase)</h1>
         <div>
         	<a target="_blank" href="http://www.google.com/intl/en/insidesearch/features/search/knowledge.html">Explore Google's Knowledge Graph</a>
         </div>
