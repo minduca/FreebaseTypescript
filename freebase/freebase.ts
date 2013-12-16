@@ -26,14 +26,14 @@ module Minduca.Freebase {
 
 		constructor(private auth?: IFreebaseRequestAuthenticationOptions) { }
 
-		public topic(mId: string, invokeOptions: IFreebaseInvokeOptions, options?: IFreebaseTopicRequestOptions): any {
+		public topic(mId: string, invokeOptions: IFreebaseTopicInvokeOptions, options?: IFreebaseTopicRequestOptions): any {
 			if (!mId || mId == '')
 				return;
 
 			var url: string = this.getTopicUrl(mId, options);
 			this.invoke(url, invokeOptions);
 		}
-		public search(options: IFreebaseSearchRequestOptions, invokeOptions: IFreebaseInvokeOptions): any {
+		public search(options: IFreebaseSearchRequestOptions, invokeOptions: IFreebaseSearchInvokeOptions): any {
 
 			if (!options || !options.query || options.query == '')
 				return;
@@ -60,20 +60,7 @@ module Minduca.Freebase {
 				};
 
 			$.ajax(request)
-				.done(function (data: any, textStatus: string, jqXHR: JQueryXHR) {
-
-					if (!data)
-						return options.fail(jqXHR, "error", "that was weird.. Nothing was returned.");
-
-					if (data.status == '200 OK') {
-						return options.done(data, textStatus, jqXHR);
-					}
-					else return data.error ?
-						options.fail(jqXHR, "error", "An error occurred. Please see the returned data for more information", data)
-						:
-						options.fail(jqXHR, "error", "Unknown behavior.", data);
-
-				})
+				.done(options.done)
 				.fail(options.fail)
 				.always(options.always);
 		}
@@ -84,6 +71,7 @@ module Minduca.Freebase {
 		private getSearchUrl(options: IFreebaseSearchRequestOptions): string { return this.buildServiceRequestUrl('search', options); }
 		private getTopicUrl(mId: string, options?: IFreebaseTopicRequestOptions) { return this.buildServiceRequestUrl('topic', options, mId); }
 		private getImageUrl(mid: string, options?: IFreebaseImageRequestOptions): string { return this.buildServiceRequestUrl('image', options, mid); }
+		private getBaseUrl(): string { return 'https://www.googleapis.com/freebase/v1/'; }
 
 		private buildServiceRequestUrl(serviceRelativePath: string, jsonQS?: IFreebaseRequestOptionsBase, ...pathsVariables: string[]): string {
 
@@ -104,11 +92,11 @@ module Minduca.Freebase {
 
 			if (pathsVariables && pathsVariables.length > 0) {
 				paths = pathsVariables.join("/");
-				if ((<any>paths.match("^/")) == "/")
+				if ((<any>paths.match("^/")) != "/")
 					paths = "/" + paths;
 			}
 
-			return 'https://www.googleapis.com/freebase/v1/'.concat(serviceRelativePath, paths, qs);
+			return this.getBaseUrl().concat(serviceRelativePath, paths, qs);
 		}
 	}
 
@@ -168,10 +156,17 @@ module Minduca.Freebase {
 		raw?: boolean;
 	}
 
-	export interface IFreebaseInvokeOptions {
+	export interface IFreebaseSearchInvokeOptions extends IFreebaseInvokeOptions {
 		done(data: IFreebaseSearchResult, textStatus: string, jqXHR: JQueryXHR): any;
+	}
+	export interface IFreebaseTopicInvokeOptions extends IFreebaseInvokeOptions {
+		done(data: IFreebaseTopicResultProperty, textStatus: string, jqXHR: JQueryXHR): any;
+	}
+
+	export interface IFreebaseInvokeOptions {
+		done(data: any, textStatus: string, jqXHR: JQueryXHR): any;
 		fail? (jqXHR: JQueryXHR, textStatus: string, errorThrow: string, data?: any): any;
-		fail? (jqXHR: JQueryXHR, textStatus: string, errorThrow: string, data?: IFreebaseSearchResultError): any;
+		fail? (jqXHR: JQueryXHR, textStatus: string, errorThrow: string, data?: IFreebaseResultError): any;
 		always? (jqXHR: JQueryXHR, textStatus: string): any;
 		async?: boolean;
 	}
@@ -183,6 +178,7 @@ module Minduca.Freebase {
 		cursor: number;
 		cost: number;
 		hits: number;
+		output?: { [prop: string]: any };
 	}
 
 	export interface IFreebaseSearchResultItem {
@@ -198,7 +194,7 @@ module Minduca.Freebase {
 		output?: any;
 	}
 
-	export interface IFreebaseSearchResultError {
+	export interface IFreebaseResultError {
 		error:
 		{
 			errors: {

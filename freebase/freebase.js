@@ -53,15 +53,7 @@
                     dataType: "json"
                 };
 
-                $.ajax(request).done(function (data, textStatus, jqXHR) {
-                    if (!data)
-                        return options.fail(jqXHR, "error", "that was weird.. Nothing was returned.");
-
-                    if (data.status == '200 OK') {
-                        return options.done(data, textStatus, jqXHR);
-                    } else
-                        return data.error ? options.fail(jqXHR, "error", "An error occurred. Please see the returned data for more information", data) : options.fail(jqXHR, "error", "Unknown behavior.", data);
-                }).fail(options.fail).always(options.always);
+                $.ajax(request).done(options.done).fail(options.fail).always(options.always);
             };
 
             FreebaseService.languageIsSupported = function (lang) {
@@ -79,6 +71,9 @@
             };
             FreebaseService.prototype.getImageUrl = function (mid, options) {
                 return this.buildServiceRequestUrl('image', options, mid);
+            };
+            FreebaseService.prototype.getBaseUrl = function () {
+                return 'https://www.googleapis.com/freebase/v1/';
             };
 
             FreebaseService.prototype.buildServiceRequestUrl = function (serviceRelativePath, jsonQS) {
@@ -103,11 +98,11 @@ else if (!jsonQS.oauth_token && this.auth.oauth_token)
 
                 if (pathsVariables && pathsVariables.length > 0) {
                     paths = pathsVariables.join("/");
-                    if ((paths.match("^/")) == "/")
+                    if ((paths.match("^/")) != "/")
                         paths = "/" + paths;
                 }
 
-                return 'https://www.googleapis.com/freebase/v1/'.concat(serviceRelativePath, paths, qs);
+                return this.getBaseUrl().concat(serviceRelativePath, paths, qs);
             };
             return FreebaseService;
         })();
