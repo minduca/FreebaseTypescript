@@ -165,8 +165,7 @@ module Minduca.Freebase {
 
 	export interface IFreebaseInvokeOptions {
 		done(data: any, textStatus: string, jqXHR: JQueryXHR): any;
-		fail? (jqXHR: JQueryXHR, textStatus: string, errorThrow: string, data?: any): any;
-		fail? (jqXHR: JQueryXHR, textStatus: string, errorThrow: string, data?: IFreebaseResultError): any;
+		fail? (jqXHR: JQueryXHR, textStatus: string, errorThrow: string): any;
 		always? (jqXHR: JQueryXHR, textStatus: string): any;
 		async?: boolean;
 	}
@@ -178,7 +177,6 @@ module Minduca.Freebase {
 		cursor: number;
 		cost: number;
 		hits: number;
-		output?: { [prop: string]: any };
 	}
 
 	export interface IFreebaseSearchResultItem {
@@ -191,7 +189,7 @@ module Minduca.Freebase {
 		};
 		lang: string;
 		score: string;
-		output?: any;
+		output?: { [prop: string]: any };
 	}
 
 	export interface IFreebaseResultError {
@@ -201,6 +199,8 @@ module Minduca.Freebase {
 				domain: string;
 				reason: string;
 				message: string;
+				location?: string;
+				locationtype?: string;
 			}[];
 			code: string;
 			message: string;
